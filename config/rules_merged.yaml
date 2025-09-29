@@ -1,0 +1,887 @@
+rules:
+  - id: aws.access_key
+    pattern: "AKIA[0-9A-Z]{16}"
+    keywords: ["aws", "access", "secret", "key"]
+    severity: high
+  - id: aws.secret_key
+    pattern: '(?i)aws_secret_access_key\s*[:=]\s*([A-Za-z0-9/+=]{40})'
+    keywords: ["aws", "secret", "key"]
+    severity: high
+  - id: gcp.api_key
+    pattern: 'AIza[0-9A-Za-z\-_]{35}'
+    keywords: ["gcp", "google", "apikey", "key"]
+    severity: high
+  - id: slack.token
+    pattern: "xox[baprs]-[0-9A-Za-z-]{10,48}"
+    keywords: ["slack", "token"]
+    severity: medium
+  - id: slack.webhook
+    pattern: 'https://hooks\.slack\.com/services/[A-Za-z0-9\-\/]+'
+    keywords: ["slack", "webhook"]
+    severity: high
+  - id: stripe.secret
+    pattern: "sk_(live|test)_[0-9A-Za-z]{24}"
+    keywords: ["stripe", "secret", "key", "token"]
+    severity: high
+  - id: stripe.publishable
+    pattern: "pk_(live|test)_[0-9A-Za-z]{24}"
+    keywords: ["stripe", "pk"]
+    severity: low
+  - id: twilio.sid
+    pattern: "AC[a-f0-9]{32}"
+    keywords: ["twilio", "sid", "account"]
+    severity: medium
+  - id: twilio.auth_token
+    pattern: '(?i)twilio.*auth[_-]?token\s*[:=]\s*[A-Za-z0-9]{32}'
+    keywords: ["twilio", "token"]
+    severity: medium
+  - id: ssh.private_key
+    pattern: "-----BEGIN (?:RSA|EC|OPENSSH|DSA)? PRIVATE KEY-----"
+    keywords: ["ssh", "rsa", "private", "key"]
+    severity: critical
+  - id: pgp.private_key
+    pattern: "-----BEGIN PGP PRIVATE KEY BLOCK-----"
+    keywords: ["pgp", "private", "key"]
+    severity: critical
+  - id: gitlab.pat
+    pattern: 'glpat-[A-Za-z0-9_-]{20,}'
+    keywords: ["gitlab", "token", "pat"]
+    severity: high
+  - id: github.token
+    pattern: 'gh[pous]_[A-Za-z0-9]{36,}'
+    keywords: ["github", "token"]
+    severity: high
+  - id: discord.webhook
+    pattern: 'https://discord(?:app)?\.com/api/webhooks/[0-9]+/[A-Za-z0-9_-]+'
+    keywords: ["discord", "webhook"]
+    severity: high
+  - id: jwt.token
+    pattern: '[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}'
+    keywords: ["jwt", "bearer", "token"]
+    severity: medium
+  - id: generic.base64_long_string
+    pattern: "\\b(?:[A-Za-z0-9+/]{24,}={0,2})\\b"
+    keywords: ["base64", "encoded", "blob"]
+    severity: low
+  - id: generic.base64_with_context
+    pattern: '(?i)\b(base64|b64|encod(e|ing)|decod(e|ing))\b[^\n]{0,80}\b[A-Za-z0-9+/]{16,}={0,2}\b'
+    keywords: ["base64", "encode", "decode", "b64"]
+    severity: medium
+  - id: code.base64_calls
+    pattern: '(?i)(base64\.(encode|decode)|b64encode|b64decode|\batob\(|\bbtoa\(|Buffer\.from\([^\)]*,\s*["\']base64["\']\)|Convert::ToBase64String|openssl\s+enc\s+-base64)'
+    keywords: ["base64", "encode", "decode", "openssl", "Buffer.from", "atob", "btoa"]
+    severity: low
+  - id: code.crypto.node
+    pattern: "(?i)crypto\\.(createCipheriv|createDecipheriv|createCipher|createDecipher)\\("
+    keywords: ["crypto", "cipher", "decipher"]
+    severity: medium
+  - id: code.crypto.java
+    pattern: '(?i)Cipher\.getInstance\("[A-Z0-9\/\-]+"\)'
+    keywords: ["cipher", "java", "getInstance"]
+    severity: medium
+  - id: code.crypto.python
+    pattern: '(?i)(cryptography|Fernet|Crypto(?:\.Cipher)?|AES\.new|DES\.new|ChaCha20|ChaCha20Poly1305|PBKDF2|scrypt|bcrypt|argon2)'
+    keywords: ["crypto", "encrypt", "decrypt", "aes", "fernet", "pbkdf2", "scrypt", "bcrypt", "argon2"]
+    severity: medium
+  - id: code.crypto.openssl
+    pattern: '(?i)openssl\s+enc\s+-[a-z0-9-]+'
+    keywords: ["openssl", "enc"]
+    severity: low
+  - id: code.crypto.dotnet
+    pattern: '(?i)(AesManaged|RijndaelManaged|ProtectedData|Aes\.Create\()'
+    keywords: ["aes", "rijndael", "protecteddata", ".net"]
+    severity: medium
+  - id: generic.password
+    pattern: "(?i)password\\s*[:=]\\s*[^\\s\"']{6,}"
+    keywords: ["password", "pwd", "pass"]
+    severity: medium
+  - id: generic.token
+    pattern: '(?i)(api[-_ ]?key|token|secret)\s*[:=]\s*[A-Za-z0-9-_]{8,}'
+    keywords: ["token", "secret", "apikey", "key"]
+    severity: medium
+  - id: db.url
+    pattern: '(?i)(postgres|mysql|mongodb|redis|amqp)://[^\s]+'
+    keywords: ["postgres", "mysql", "mongodb", "redis", "amqp", "url"]
+    severity: medium
+  - id: azure.storage_key
+    pattern: 'DefaultEndpointsProtocol=https;AccountName=[A-Za-z0-9-]+;AccountKey=[A-Za-z0-9+/=]{43,}=='
+    keywords: ["azure", "storage", "accountkey"]
+    severity: high
+  - id: internal.url
+    pattern: 'https?://(?:10|127|172\.(?:1[6-9]|2\d|3[01])|192\.168)\.[^\s]+'
+    keywords: ["internal", "url", "service"]
+    severity: low
+  - id: url.basic_auth
+    pattern: 'https?://[^\s:/]+:[^\s@]+@[^\s]+'
+    keywords: ["http", "https", "basic", "auth"]
+    severity: high
+  - id: openai.api_key
+    pattern: 'sk-[A-Za-z0-9]{32,}'
+    keywords: ["openai", "api", "key", "sk"]
+    severity: high
+  - id: telegram.bot_token
+    pattern: '[0-9]{8,10}:[A-Za-z0-9_-]{35}'
+    keywords: ["telegram", "bot", "token"]
+    severity: medium
+  - id: sendgrid.api_key
+    pattern: 'SG\.[A-Za-z0-9_-]{66}'
+    keywords: ["sendgrid", "api", "key"]
+    severity: high
+  - id: mailgun.api_key
+    pattern: 'key-[A-Za-z0-9]{32}'
+    keywords: ["mailgun", "api", "key"]
+    severity: high
+  - id: pagerduty.integration_key
+    pattern: '(?i)pagerduty.*(integration|routing).*key\s*[:=]\s*[A-Z0-9]{32}'
+    keywords: ["pagerduty", "key"]
+    severity: medium
+  - id: datadog.api_key
+    pattern: '(?i)datadog.*api[_-]?key\s*[:=]\s*[0-9a-f]{32}'
+    keywords: ["datadog", "api", "key"]
+    severity: medium
+  - id: sentry.dsn
+    pattern: 'https://[A-Za-z0-9]{32}@sentry\.io/\d+'
+    keywords: ["sentry", "dsn"]
+    severity: medium
+  - id: newrelic.license_key
+    pattern: '(?i)newrelic.*(license|api).*key\s*[:=]\s*[A-Za-z0-9]{32,}'
+    keywords: ["newrelic", "license", "key"]
+    severity: medium
+  - id: cloudflare.api_token
+    pattern: '(?i)cloudflare.*(api[_-]?token|api[_-]?key)\s*[:=]\s*[A-Za-z0-9-_]{40,}'
+    keywords: ["cloudflare", "api", "token"]
+    severity: high
+  - id: digitalocean.pat
+    pattern: 'dop_v1_[a-f0-9]{64}'
+    keywords: ["digitalocean", "token"]
+    severity: high
+  - id: heroku.api_key
+    pattern: '(?i)heroku.*api[_-]?key\s*[:=]\s*[0-9a-f]{32}'
+    keywords: ["heroku", "api", "key"]
+    severity: high
+  - id: square.access_token
+    pattern: 'sq0atp-[A-Za-z0-9\-_]+'
+    keywords: ["square", "access", "token"]
+    severity: high
+  - id: square.client_secret
+    pattern: 'sq0csp-[A-Za-z0-9\-_]+'
+    keywords: ["square", "client", "secret"]
+    severity: high
+  - id: huggingface.token
+    pattern: 'hf_[A-Za-z0-9]{32,}'
+    keywords: ["huggingface", "token"]
+    severity: medium
+  - id: notion.secret
+    pattern: 'secret_[A-Za-z0-9]{43,}'
+    keywords: ["notion", "secret", "token"]
+    severity: medium
+  - id: linear.api_key
+    pattern: 'lin_[a-z0-9]{40}'
+    keywords: ["linear", "api", "key"]
+    severity: medium
+  - id: okta.api_token
+    pattern: '(?i)okta.*api[_-]?token\s*[:=]\s*[A-Za-z0-9_-]{20,}'
+    keywords: ["okta", "api", "token"]
+    severity: high
+  - id: jira.api_token
+    pattern: '(?i)(jira|atlassian).*api[_-]?token\s*[:=]\s*[A-Za-z0-9]{20,}'
+    keywords: ["jira", "atlassian", "token"]
+    severity: medium
+  - id: jenkins.api_token
+    pattern: '(?i)jenkins.*(api[_-]?token|crumb)\s*[:=]\s*[A-Za-z0-9]{16,}'
+    keywords: ["jenkins", "token"]
+    severity: medium
+  - id: confluence.token
+    pattern: '(?i)confluence.*api[_-]?token\s*[:=]\s*[A-Za-z0-9]{20,}'
+    keywords: ["confluence", "token"]
+    severity: medium
+  - id: bitbucket.app_password
+    pattern: '(?i)bitbucket.*(app[_-]?password|token)\s*[:=]\s*[A-Za-z0-9]{20,}'
+    keywords: ["bitbucket", "password", "token"]
+    severity: medium
+  - id: artifactory.api_key
+    pattern: '(?i)artifactory.*(api[_-]?key|access[_-]?token)\s*[:=]\s*[A-Za-z0-9._-]{20,}'
+    keywords: ["artifactory", "token", "key"]
+    severity: high
+  - id: nexus.token
+    pattern: '(?i)nexus.*(api[_-]?key|token)\s*[:=]\s*[A-Za-z0-9._-]{16,}'
+    keywords: ["nexus", "token", "key"]
+    severity: medium
+  - id: grafana.token
+    pattern: '(?i)grafana.*(api[_-]?key|token)\s*[:=]\s*[A-Za-z0-9_-]{20,}'
+    keywords: ["grafana", "token"]
+    severity: medium
+  - id: prometheus.basic_auth
+    pattern: "(?i)prometheus.*(basic[_-]?auth|password)\\s*[:=]\\s*[^\\s\"']{6,}"
+    keywords: ["prometheus", "password", "auth"]
+    severity: low
+  - id: service.endpoints
+    pattern: 'https?://[^\s]*(jenkins|jira|confluence|bitbucket|artifactory|nexus|sonarqube|grafana|prometheus)[^\s]*'
+    keywords: ["endpoint", "service", "url"]
+    severity: low
+  - id: ipv4.private
+    pattern: '\\b(?:10|127|172\.(?:1[6-9]|2\d|3[01])|192\.168)\.(?:25[0-5]|2[0-4]\d|1?\d?\d)\.(?:25[0-5]|2[0-4]\d|1?\d?\d)\.(?:25[0-5]|2[0-4]\d|1?\d?\d)\\b'
+    keywords: ["ip", "private"]
+    severity: low
+  - id: ipv4.public
+    pattern: '\\b(?:(?:[1-9]\\d?|1\\d\\d|2[01]\\d|22[0-3])\\.){3}(?:[1-9]\\d?|1\\d\\d|2[0-4]\\d|25[0-5])\\b'
+    keywords: ["ip", "public"]
+    severity: low
+  - id: env.database_url
+    pattern: '(?i)^\s*DATABASE_URL\s*[:=]\s*\S+'
+    keywords: ["database_url", "env"]
+    severity: high
+  - id: env.jwt_secret
+    pattern: '(?i)^\s*JWT_SECRET(_KEY)?\s*[:=]\s*\S+'
+    keywords: ["jwt", "secret", "env"]
+    severity: high
+  - id: env.google_application_credentials
+    pattern: '(?i)^\s*GOOGLE_APPLICATION_CREDENTIALS\s*[:=]\s*\S+'
+    keywords: ["google", "credentials", "env"]
+    severity: medium
+  - id: env.gcp_api_key
+    pattern: '(?i)^\s*GCP_API_KEY\s*[:=]\s*\S+'
+    keywords: ["gcp", "api", "key", "env"]
+    severity: high
+  - id: env.firebase_api_key
+    pattern: '(?i)^\s*FIREBASE_API_KEY\s*[:=]\s*\S+'
+    keywords: ["firebase", "api", "key", "env"]
+    severity: high
+  - id: env.azure_storage_connection_string
+    pattern: '(?i)^\s*AZURE_STORAGE_CONNECTION_STRING\s*[:=]\s*\S+'
+    keywords: ["azure", "storage", "connection", "env"]
+    severity: high
+  - id: env.azure_client_secret
+    pattern: '(?i)^\s*AZURE_CLIENT_SECRET\s*[:=]\s*\S+'
+    keywords: ["azure", "client", "secret", "env"]
+    severity: high
+  - id: env.slack_bot_token
+    pattern: '(?i)^\s*SLACK_BOT_TOKEN\s*[:=]\s*\S+'
+    keywords: ["slack", "bot", "token", "env"]
+    severity: high
+  - id: env.discord_token
+    pattern: '(?i)^\s*DISCORD_(WEBHOOK|TOKEN)\s*[:=]\s*\S+'
+    keywords: ["discord", "token", "env"]
+    severity: high
+  - id: env.stripe_secret
+    pattern: '(?i)^\s*STRIPE_(SECRET|SK)_?KEY\s*[:=]\s*\S+'
+    keywords: ["stripe", "secret", "key", "env"]
+    severity: high
+  - id: env.twilio_auth_token
+    pattern: '(?i)^\s*TWILIO_AUTH_TOKEN\s*[:=]\s*\S+'
+    keywords: ["twilio", "auth", "token", "env"]
+    severity: medium
+  - id: env.github_token
+    pattern: '(?i)^\s*GH[A-Z_]*_TOKEN\s*[:=]\s*\S+'
+    keywords: ["github", "token", "env"]
+    severity: high
+  - id: env.gitlab_token
+    pattern: '(?i)^\s*GITLAB(_PAT|_TOKEN)?\s*[:=]\s*\S+'
+    keywords: ["gitlab", "token", "env"]
+    severity: high
+  - id: env.aws_session_token
+    pattern: '(?i)^\s*AWS_SESSION_TOKEN\s*[:=]\s*\S+'
+    keywords: ["aws", "session", "token", "env"]
+    severity: medium
+  - id: env.mongo_uri
+    pattern: '(?i)^\s*(MONGODB_URI|MONGO_URI)\s*[:=]\s*\S+'
+    keywords: ["mongo", "uri", "env"]
+    severity: medium
+  - id: env.redis_url
+    pattern: '(?i)^\s*REDIS_URL\s*[:=]\s*\S+'
+    keywords: ["redis", "url", "env"]
+    severity: medium
+  - id: env.smtp_password
+    pattern: '(?i)^\s*(SMTP_PASSWORD|SMTP_PASS|MAIL_PASSWORD)\s*[:=]\s*\S+'
+    keywords: ["smtp", "password", "env"]
+    severity: medium
+  - id: aws.temp_access_key
+    pattern: 'ASIA[0-9A-Z]{16}'
+    keywords: ["aws", "sts", "temporary", "access", "key"]
+    severity: high
+  - id: npm.auth_token
+    pattern: '(?i)^\s*//registry\.npmjs\.org/:_authToken\s*=\s*\S+'
+    keywords: ["npm", "authToken"]
+    severity: high
+  - id: pypi.token
+    pattern: 'pypi-[-A-Za-z0-9_]{20,}'
+    keywords: ["pypi", "token"]
+    severity: high
+  - id: docker.auth
+    pattern: '"auth"\s*:\s*"[A-Za-z0-9+/=]{8,}"'
+    keywords: ["docker", "config", "auth"]
+    severity: medium
+  - id: google.oauth_client_secret
+    pattern: '"client_secret"\s*:\s*"[^"]+"'
+    keywords: ["google", "oauth", "client_secret"]
+    severity: high
+  - id: oauth.access_token_json
+    pattern: '"access_token"\s*:\s*"[^"]+"'
+    keywords: ["oauth", "access_token"]
+    severity: medium
+  - id: k8s.kubeconfig_token
+    pattern: '(?i)\btoken:\s*[A-Za-z0-9\._\-]{20,}'
+    keywords: ["kubeconfig", "token", "k8s"]
+    severity: medium
+  - id: azure.sas_token
+    pattern: '(?i)[\?&]sv=[^&]+&ss=[^&]+&srt=[^&]+&sp=[^&]+&se=[^&]+&st=[^&]+&spr=[^&]+&sig=[^&]+'
+    keywords: ["azure", "sas", "sig"]
+    severity: high
+  - id: vault.token
+    pattern: '(?i)^(\s*(VAULT_TOKEN|VAULT_ROOT_TOKEN)\s*[:=]\s*\S+|hvs\.[A-Za-z0-9]{24,})'
+    keywords: ["vault", "token"]
+    severity: high
+  - id: terraform.cloud_token
+    pattern: '(?i)^\s*TFE_TOKEN\s*[:=]\s*\S+'
+    keywords: ["terraform", "tfe", "token"]
+    severity: high
+  - id: databricks.pat
+    pattern: 'dapi[a-z0-9]{32}'
+    keywords: ["databricks", "token"]
+    severity: high
+  - id: sendinblue.api_key
+    pattern: 'xkeysib-[A-Za-z0-9]{64}-[A-Za-z0-9]{16}'
+    keywords: ["sendinblue", "api", "key"]
+    severity: high
+  - id: algolia.admin_key
+    pattern: '(?i)^\s*ALGOLIA_ADMIN_API_KEY\s*[:=]\s*\S+'
+    keywords: ["algolia", "admin", "api", "key"]
+    severity: high
+  - id: salesforce.credentials
+    pattern: '(?i)\b(SF_USERNAME|SF_PASSWORD|SF_SECURITY_TOKEN)\s*[:=]\s*\S+'
+    keywords: ["salesforce", "sf", "username", "password", "token"]
+    severity: medium
+  - id: sentry.auth_token
+    pattern: '(?i)^\s*SENTRY_AUTH_TOKEN\s*[:=]\s*\S+'
+    keywords: ["sentry", "auth", "token"]
+    severity: high
+  - id: sonar.token
+    pattern: '(?i)^\s*(SONAR_TOKEN|SONARQUBE_TOKEN)\s*[:=]\s*\S+'
+    keywords: ["sonar", "token"]
+    severity: high
+  - id: gitlab.ci_token
+    pattern: '(?i)^\s*(CI_JOB_TOKEN|CI_REGISTRY_PASSWORD|RUNNER_TOKEN)\s*[:=]\s*\S+'
+    keywords: ["gitlab", "ci", "token", "runner"]
+    severity: high
+  - id: kubernetes.service_account
+    pattern: '(?i)\bserviceAccount(Name)?\s*[:=]\s*\S+'
+    keywords: ["k8s", "serviceaccount"]
+    severity: low
+  - id: aws.cli_credentials
+    pattern: '(?i)^\s*(aws_access_key_id|aws_secret_access_key|aws_session_token)\s*=\s*\S+'
+    keywords: ["aws", "credentials", "cli"]
+    severity: high
+  - id: jira.basic_auth
+    pattern: '(?i)https?://[^\s:/]+:[^\s@]+@[^\s]+/rest/api/2'
+    keywords: ["jira", "basic", "auth"]
+    severity: high
+  - id: grafana.admin_password
+    pattern: '(?i)^\s*(GF_SECURITY_ADMIN_PASSWORD|GF_SECURITY_ADMIN_USER)\s*[:=]\s*\S+'
+    keywords: ["grafana", "admin", "password"]
+    severity: medium
+  - id: minio.credentials
+    pattern: '(?i)^\s*(MINIO_ROOT_USER|MINIO_ROOT_PASSWORD)\s*[:=]\s*\S+'
+    keywords: ["minio", "root", "password"]
+    severity: high
+  - id: rabbitmq.user_pass
+    pattern: '(?i)^\s*(RABBITMQ_DEFAULT_USER|RABBITMQ_DEFAULT_PASS)\s*[:=]\s*\S+'
+    keywords: ["rabbitmq", "user", "pass"]
+    severity: medium
+  - id: postgresql.conn_string
+    pattern: '(?i)postgresql://[^:\s]+:[^@\s]+@[^/\s]+/\S+'
+    keywords: ["postgresql", "conn", "string"]
+    severity: high
+  - id: mysql.conn_string
+    pattern: '(?i)mysql://[^:\s]+:[^@\s]+@[^/\s]+/\S+'
+    keywords: ["mysql", "conn", "string"]
+    severity: high
+  - id: elastic.api_key
+    pattern: '(?i)^\s*(ELASTIC_API_KEY|ELASTICSEARCH_API_KEY)\s*[:=]\s*\S+'
+    keywords: ["elastic", "api", "key"]
+    severity: high
+  - id: consul.acl_token
+    pattern: '(?i)^\s*(CONSUL_HTTP_TOKEN|CONSUL_ACL_TOKEN)\s*[:=]\s*\S+'
+    keywords: ["consul", "acl", "token"]
+    severity: high
+  - id: vault.addr_token
+    pattern: '(?i)^\s*(VAULT_ADDR|VAULT_TOKEN)\s*[:=]\s*\S+'
+    keywords: ["vault", "addr", "token"]
+    severity: high
+  - id: suspicious.runas_command
+    pattern: '(?i)(^|\n|\s)runas(?:\.exe)?\b.*(/user:|/savecred)'
+    keywords: ["runas", "user", "savecred"]
+    severity: medium
+  - id: suspicious.impersonation_api
+    pattern: '(?i)(impersonate|logonuser|CreateProcessWithLogonW|as_user|become_user)'
+    keywords: ["impersonate", "logonuser", "as_user", "become_user"]
+    severity: medium
+  - id: suspicious.get_credentials_calls
+    pattern: '(?i)(getcreds|get_?cred(ent(ial)?)?|get-credential|Get-Credential|PSCredential|ConvertTo-SecureString)'
+    keywords: ["getcreds", "credential", "pscredential"]
+    severity: medium
+  - id: cmd.cmdkey_usage
+    pattern: '(?i)\bcmdkey(?:\.exe)?\b.*(/add:|/user:|/pass:|/generic:)'
+    keywords: ["cmdkey", "user", "pass"]
+    severity: medium
+  - id: batch.set_user
+    pattern: '(?i)^\s*set(?:x)?\s+(USER(NAME)?|LOGIN|ACCOUNT)\s*=\s*\S+'
+    keywords: ["set", "user", "username", "login"]
+    severity: low
+  - id: batch.set_password
+    pattern: '(?i)^\s*set(?:x)?\s+(PASS(?:WD|WORD)?|PWD)\s*=\s*\S+'
+    keywords: ["set", "pass", "pwd", "password"]
+    severity: high
+  - id: shell.export_user
+    pattern: '(?i)^\s*export\s+(USER(NAME)?|LOGIN|ACCOUNT)\s*=\s*\S+'
+    keywords: ["export", "user", "username", "login"]
+    severity: low
+  - id: shell.export_password
+    pattern: '(?i)^\s*export\s+(PASS(?:WD|WORD)?|PWD|PASSWORD)\s*=\s*\S+'
+    keywords: ["export", "pass", "pwd", "password"]
+    severity: high
+  - id: generic.pass_kw_assignment
+    pattern: "(?i)\\b(PASS(?:WD|WORD)?|PWD)\\s*[:=]\\s*[^\\s\"']{4,}"
+    keywords: ["pass", "pwd", "password"]
+    severity: medium
+  - id: generic.cfg_secret_assignment
+    pattern: "(?i)\\b(cfg|config|configuration|settings)\\b[^\n]{0,80}\\b(password|pass|pwd|secret|token|key)\\b\\s*[:=]\\s*\\S+"
+    keywords: ["cfg", "config", "configuration", "settings", "secret", "token", "key", "password", "pass", "pwd"]
+    severity: high
+  - id: generic.jwt_config
+    pattern: "(?i)\\b(jwt(_secret|_key)?|jwtPrivateKey|jwtPublicKey)\\b[^\n]{0,80}[:=]\\s*\\S+"
+    keywords: ["jwt", "secret", "key"]
+    severity: high
+  - id: powershell.credential_usage
+    pattern: '(?i)(Start-Process|Invoke-Command|New-Object)\b[^\n]{0,80}-Credential\s+\$?\w+'
+    keywords: ["powershell", "-Credential", "Start-Process"]
+    severity: medium
+  - id: config.password_key
+    pattern: '(?i)(spring\.datasource\.password|db_password|database_password|redis_password)\s*[:=]\s*\S+'
+    keywords: ["password", "datasource", "db"]
+    severity: medium
+  - id: config.username_key
+    pattern: '(?i)(spring\.datasource\.username|db_user(name)?|database_user(name)?)\s*[:=]\s*\S+'
+    keywords: ["username", "datasource", "db"]
+    severity: low
+  - id: connection_string.user_pwd
+    pattern: '(?i)(User Id|UserID|Uid|Username)=[^;\s]+;\s*(Password|Pwd)=[^;\s]+'
+    keywords: ["connection", "user", "password"]
+    severity: high
+  - id: netuse.credentials
+    pattern: '(?i)\bnet\s+use\s+\\\\[^\s]+\s+\S+\s+/user:[^\s]+'
+    keywords: ["net", "use", "user"]
+    severity: medium
+  - id: env.secret_key
+    pattern: '(?i)^\s*SECRET_KEY\s*[:=]\s*\S+'
+    keywords: ["secret_key", "env", "config"]
+    severity: medium
+  - id: env.aws_access_key_id
+    pattern: '(?i)^\s*AWS_ACCESS_KEY_ID\s*[:=]\s*\S+'
+    keywords: ["aws", "access_key_id", "env"]
+    severity: medium
+  - id: env.aws_secret_access_key
+    pattern: '(?i)^\s*AWS_SECRET_ACCESS_KEY\s*[:=]\s*\S+'
+    keywords: ["aws", "secret_access_key", "env"]
+    severity: high
+
+  # Added vendor-specific rules from config/regex_from_internet (first 50)
+  - id: vendor.zopim_account_key
+    pattern: "(?i)[\"']?zopim[_-]?account[_-]?key[\"']?[^\\S\r\n]*[=:][^\\S\r\n]*[\"']?[\\w-]+[\"']?"
+    keywords: ["zopim", "account", "key"]
+    severity: high
+  - id: vendor.zhuliang_gh_token
+    pattern: "(?i)[\"']?zhuliang[_-]?gh[_-]?token[\"']?[^\\S\r\n]*[=:][^\\S\r\n]*[\"']?[\\w-]+[\"']?"
+    keywords: ["zhuliang", "github", "token"]
+    severity: high
+  - id: vendor.zensonatypepassword
+    pattern: "(?i)[\"']?zensonatypepassword[\"']?[^\\S\r\n]*[=:][^\\S\r\n]*[\"']?[\\w-]+[\"']?"
+    keywords: ["sonatype", "password"]
+    severity: high
+  - id: vendor.zendesk_any
+    pattern: "(?i)zendesk(_api_token|_key|_token|-travis-github|_url|_username)(\\s|=)"
+    keywords: ["zendesk", "token", "key", "url", "username"]
+    severity: high
+  - id: vendor.yt_server_api_key
+    pattern: "(?i)[\"']?yt[_-]?server[_-]?api[_-]?key[\"']?[^\\S\r\n]*[=:][^\\S\r\n]*[\"']?[\\w-]+[\"']?"
+    keywords: ["yt", "server", "api", "key"]
+    severity: high
+  - id: vendor.yt_partner_refresh_token
+    pattern: "(?i)[\"']?yt[_-]?partner[_-]?refresh[_-]?token[\"']?[^\\S\r\n]*[=:][^\\S\r\n]*[\"']?[\\w-]+[\"']?"
+    keywords: ["yt", "partner", "refresh", "token"]
+    severity: high
+  - id: vendor.yt_partner_client_secret
+    pattern: "(?i)[\"']?yt[_-]?partner[_-]?client[_-]?secret[\"']?[^\\S\r\n]*[=:][^\\S\r\n]*[\"']?[\\w-]+[\"']?"
+    keywords: ["yt", "partner", "client", "secret"]
+    severity: high
+  - id: vendor.yt_client_secret
+    pattern: "(?i)[\"']?yt[_-]?client[_-]?secret[\"']?[^\\S\r\n]*[=:][^\\S\r\n]*[\"']?[\\w-]+[\"']?"
+    keywords: ["yt", "client", "secret"]
+    severity: high
+  - id: vendor.yt_api_key
+    pattern: "(?i)[\"']?yt[_-]?api[_-]?key[\"']?[^\\S\r\n]*[=:][^\\S\r\n]*[\"']?[\\w-]+[\"']?"
+    keywords: ["yt", "api", "key"]
+    severity: high
+  - id: vendor.yt_account_refresh_token
+    pattern: "(?i)[\"']?yt[_-]?account[_-]?refresh[_-]?token[\"']?[^\\S\r\n]*[=:][^\\S\r\n]*[\"']?[\\w-]+[\"']?"
+    keywords: ["yt", "account", "refresh", "token"]
+    severity: high
+  - id: vendor.yt_account_client_secret
+    pattern: "(?i)[\"']?yt[_-]?account[_-]?client[_-]?secret[\"']?[^\\S\r\n]*[=:][^\\S\r\n]*[\"']?[\\w-]+[\"']?"
+    keywords: ["yt", "account", "client", "secret"]
+    severity: high
+  - id: vendor.yangshun_gh_token
+    pattern: "(?i)[\"']?yangshun[_-]?gh[_-]?token[\"']?[^\\S\r\n]*[=:][^\\S\r\n]*[\"']?[\\w-]+[\"']?"
+    keywords: ["yangshun", "github", "token"]
+    severity: high
+  - id: vendor.yangshun_gh_password
+    pattern: "(?i)[\"']?yangshun[_-]?gh[_-]?password[\"']?[^\\S\r\n]*[=:][^\\S\r\n]*[\"']?[\\w-]+[\"']?"
+    keywords: ["yangshun", "github", "password"]
+    severity: high
+  - id: vendor.www_googleapis_com
+    pattern: "(?i)[\"']?www[_-]?googleapis[_-]?com[\"']?[^\\S\r\n]*[=:][^\\S\r\n]*[\"']?[\\w-]+[\"']?"
+    keywords: ["googleapis", "www", "com"]
+    severity: high
+  - id: vendor.wpt_ssh_private_key_base64
+    pattern: "(?i)[\"']?wpt[_-]?ssh[_-]?private[_-]?key[_-]?base64[\"']?[^\\S\r\n]*[=:][^\\S\r\n]*[\"']?[\\w-]+[\"']?"
+    keywords: ["wpt", "ssh", "private", "key", "base64"]
+    severity: high
+  - id: vendor.wpt_ssh_connect
+    pattern: "(?i)[\"']?wpt[_-]?ssh[_-]?connect[\"']?[^\\S\r\n]*[=:][^\\S\r\n]*[\"']?[\\w-]+[\"']?"
+    keywords: ["wpt", "ssh", "connect"]
+    severity: high
+  - id: vendor.wpt_report_api_key
+    pattern: "(?i)[\"']?wpt[_-]?report[_-]?api[_-]?key[\"']?[^\\S\r\n]*[=:][^\\S\r\n]*[\"']?[\\w-]+[\"']?"
+    keywords: ["wpt", "report", "api", "key"]
+    severity: high
+  - id: vendor.wpt_prepare_dir
+    pattern: "(?i)[\"']?wpt[_-]?prepare[_-]?dir[\"']?[^\\S\r\n]*[=:][^\\S\r\n]*[\"']?[\\w-]+[\"']?"
+    keywords: ["wpt", "prepare", "dir"]
+    severity: high
+  - id: vendor.wpt_db_user
+    pattern: "(?i)[\"']?wpt[_-]?db[_-]?user[\"']?[^\\S\r\n]*[=:][^\\S\r\n]*[\"']?[\\w-]+[\"']?"
+    keywords: ["wpt", "db", "user"]
+    severity: high
+  - id: vendor.wpt_db_password
+    pattern: "(?i)[\"']?wpt[_-]?db[_-]?password[\"']?[^\\S\r\n]*[=:][^\\S\r\n]*[\"']?[\\w-]+[\"']?"
+    keywords: ["wpt", "db", "password"]
+    severity: high
+  - id: vendor.wporg_password
+    pattern: "(?i)[\"']?wporg[_-]?password[\"']?[^\\S\r\n]*[=:][^\\S\r\n]*[\"']?[\\w-]+[\"']?"
+    keywords: ["wporg", "password"]
+    severity: high
+  - id: vendor.wpjm_phpunit_google_geocode_api_key
+    pattern: "(?i)[\"']?wpjm[_-]?phpunit[_-]?google[_-]?geocode[_-]?api[_-]?key[\"']?[^\\S\r\n]*[=:][^\\S\r\n]*[\"']?[\\w-]+[\"']?"
+    keywords: ["wpjm", "phpunit", "google", "geocode", "api", "key"]
+    severity: high
+  - id: vendor.wordpress_db_user
+    pattern: "(?i)[\"']?wordpress[_-]?db[_-]?user[\"']?[^\\S\r\n]*[=:][^\\S\r\n]*[\"']?[\\w-]+[\"']?"
+    keywords: ["wordpress", "db", "user"]
+    severity: high
+  - id: vendor.wordpress_db_password
+    pattern: "(?i)[\"']?wordpress[_-]?db[_-]?password[\"']?[^\\S\r\n]*[=:][^\\S\r\n]*[\"']?[\\w-]+[\"']?"
+    keywords: ["wordpress", "db", "password"]
+    severity: high
+  - id: vendor.wincert_password
+    pattern: "(?i)[\"']?wincert[_-]?password[\"']?[^\\S\r\n]*[=:][^\\S\r\n]*[\"']?[\\w-]+[\"']?"
+    keywords: ["wincert", "password"]
+    severity: high
+  - id: vendor.widget_test_server
+    pattern: "(?i)[\"']?widget[_-]?test[_-]?server[\"']?[^\\S\r\n]*[=:][^\\S\r\n]*[\"']?[\\w-]+[\"']?"
+    keywords: ["widget", "test", "server"]
+    severity: high
+  - id: vendor.widget_fb_password_3
+    pattern: "(?i)[\"']?widget[_-]?fb[_-]?password[_-]?3[\"']?[^\\S\r\n]*[=:][^\\S\r\n]*[\"']?[\\w-]+[\"']?"
+    keywords: ["widget", "fb", "password"]
+    severity: high
+  - id: vendor.widget_fb_password_2
+    pattern: "(?i)[\"']?widget[_-]?fb[_-]?password[_-]?2[\"']?[^\\S\r\n]*[=:][^\\S\r\n]*[\"']?[\\w-]+[\"']?"
+    keywords: ["widget", "fb", "password"]
+    severity: high
+  - id: vendor.widget_fb_password
+    pattern: "(?i)[\"']?widget[_-]?fb[_-]?password[\"']?[^\\S\r\n]*[=:][^\\S\r\n]*[\"']?[\\w-]+[\"']?"
+    keywords: ["widget", "fb", "password"]
+    severity: high
+  - id: vendor.widget_basic_password_5
+    pattern: "(?i)[\"']?widget[_-]?basic[_-]?password[_-]?5[\"']?[^\\S\r\n]*[=:][^\\S\r\n]*[\"']?[\\w-]+[\"']?"
+    keywords: ["widget", "basic", "password"]
+    severity: high
+  - id: vendor.widget_basic_password_4
+    pattern: "(?i)[\"']?widget[_-]?basic[_-]?password[_-]?4[\"']?[^\\S\r\n]*[=:][^\\S\r\n]*[\"']?[\\w-]+[\"']?"
+    keywords: ["widget", "basic", "password"]
+    severity: high
+  - id: vendor.widget_basic_password_3
+    pattern: "(?i)[\"']?widget[_-]?basic[_-]?password[_-]?3[\"']?[^\\S\r\n]*[=:][^\\S\r\n]*[\"']?[\\w-]+[\"']?"
+    keywords: ["widget", "basic", "password"]
+    severity: high
+  - id: vendor.widget_basic_password_2
+    pattern: "(?i)[\"']?widget[_-]?basic[_-]?password[_-]?2[\"']?[^\\S\r\n]*[=:][^\\S\r\n]*[\"']?[\\w-]+[\"']?"
+    keywords: ["widget", "basic", "password"]
+    severity: high
+  - id: vendor.widget_basic_password
+    pattern: "(?i)[\"']?widget[_-]?basic[_-]?password[\"']?[^\\S\r\n]*[=:][^\\S\r\n]*[\"']?[\\w-]+[\"']?"
+    keywords: ["widget", "basic", "password"]
+    severity: high
+  - id: vendor.watson_password
+    pattern: "(?i)[\"']?watson[_-]?password[\"']?[^\\S\r\n]*[=:][^\\S\r\n]*[\"']?[\\w-]+[\"']?"
+    keywords: ["watson", "password"]
+    severity: high
+  - id: vendor.watson_device_password
+    pattern: "(?i)[\"']?watson[_-]?device[_-]?password[\"']?[^\\S\r\n]*[=:][^\\S\r\n]*[\"']?[\\w-]+[\"']?"
+    keywords: ["watson", "device", "password"]
+    severity: high
+  - id: vendor.watson_conversation_password
+    pattern: "(?i)[\"']?watson[_-]?conversation[_-]?password[\"']?[^\\S\r\n]*[=:][^\\S\r\n]*[\"']?[\\w-]+[\"']?"
+    keywords: ["watson", "conversation", "password"]
+    severity: high
+  - id: vendor.wakatime_api_key
+    pattern: "(?i)[\"']?wakatime[_-]?api[_-]?key[\"']?[^\\S\r\n]*[=:][^\\S\r\n]*[\"']?[\\w-]+[\"']?"
+    keywords: ["wakatime", "api", "key"]
+    severity: high
+  - id: vendor.vscetoken
+    pattern: "(?i)[\"']?vscetoken[\"']?[^\\S\r\n]*[=:][^\\S\r\n]*[\"']?[\\w-]+[\"']?"
+    keywords: ["vsce", "token"]
+    severity: high
+  - id: vendor.visual_recognition_api_key
+    pattern: "(?i)[\"']?visual[_-]?recognition[_-]?api[_-]?key[\"']?[^\\S\r\n]*[=:][^\\S\r\n]*[\"']?[\\w-]+[\"']?"
+    keywords: ["visual", "recognition", "api", "key"]
+    severity: high
+  - id: vendor.virustotal_apikey
+    pattern: "(?i)[\"']?virustotal[_-]?apikey[\"']?[^\\S\r\n]*[=:][^\\S\r\n]*[\"']?[\\w-]+[\"']?"
+    keywords: ["virustotal", "apikey"]
+    severity: high
+  - id: vendor.vip_github_deploy_key_pass
+    pattern: "(?i)[\"']?vip[_-]?github[_-]?deploy[_-]?key[_-]?pass[\"']?[^\\S\r\n]*[=:][^\\S\r\n]*[\"']?[\\w-]+[\"']?"
+    keywords: ["vip", "github", "deploy", "key", "pass"]
+    severity: high
+  - id: vendor.vip_github_deploy_key
+    pattern: "(?i)[\"']?vip[_-]?github[_-]?deploy[_-]?key[\"']?[^\\S\r\n]*[=:][^\\S\r\n]*[\"']?[\\w-]+[\"']?"
+    keywords: ["vip", "github", "deploy", "key"]
+    severity: high
+  - id: vendor.vip_github_build_repo_deploy_key
+    pattern: "(?i)[\"']?vip[_-]?github[_-]?build[_-]?repo[_-]?deploy[_-]?key[\"']?[^\\S\r\n]*[=:][^\\S\r\n]*[\"']?[\\w-]+[\"']?"
+    keywords: ["vip", "github", "build", "repo", "deploy", "key"]
+    severity: high
+  - id: vendor.v_sfdc_password
+    pattern: "(?i)[\"']?v[_-]?sfdc[_-]?password[\"']?[^\\S\r\n]*[=:][^\\S\r\n]*[\"']?[\\w-]+[\"']?"
+    keywords: ["sfdc", "password"]
+    severity: high
+  - id: vendor.v_sfdc_client_secret
+    pattern: "(?i)[\"']?v[_-]?sfdc[_-]?client[_-]?secret[\"']?[^\\S\r\n]*[=:][^\\S\r\n]*[\"']?[\\w-]+[\"']?"
+    keywords: ["sfdc", "client", "secret"]
+    severity: high
+  - id: vendor.usertravis
+    pattern: "(?i)[\"']?usertravis[\"']?[^\\S\r\n]*[=:][^\\S\r\n]*[\"']?[\\w-]+[\"']?"
+    keywords: ["usertravis"]
+    severity: high
+  - id: vendor.user_assets_secret_access_key
+    pattern: "(?i)[\"']?user[_-]?assets[_-]?secret[_-]?access[_-]?key[\"']?[^\\S\r\n]*[=:][^\\S\r\n]*[\"']?[\\w-]+[\"']?"
+    keywords: ["user", "assets", "secret", "access", "key"]
+    severity: high
+  - id: vendor.user_assets_access_key_id
+    pattern: "(?i)[\"']?user[_-]?assets[_-]?access[_-]?key[_-]?id[\"']?[^\\S\r\n]*[=:][^\\S\r\n]*[\"']?[\\w-]+[\"']?"
+    keywords: ["user", "assets", "access", "key", "id"]
+    severity: high
+  - id: vendor.use_ssh
+    pattern: "(?i)[\"']?use[_-]?ssh[\"']?[^\\S\r\n]*[=:][^\\S\r\n]*[\"']?[\\w-]+[\"']?"
+    keywords: ["use", "ssh"]
+    severity: high
+  - id: vendor.us_east_1_elb_amazonaws_com
+    pattern: "(?i)[\"']?us[_-]?east[_-]?1[_-]?elb[_-]?amazonaws[_-]?com[\"']?[^\\S\r\n]*[=:][^\\S\r\n]*[\"']?[\\w-]+[\"']?"
+    keywords: ["us-east-1", "elb", "amazonaws", "com"]
+    severity: high
+  - id: vendor.urban_secret
+    pattern: "(?i)[\"']?urban[_-]?secret[\"']?[^\\S\r\n]*[=:][^\\S\r\n]*[\"']?[\\w-]+[\"']?"
+    keywords: ["urban", "secret"]
+    severity: high
+  - id: vendor.urban_master_secret
+    pattern: "(?i)[\"']?urban[_-]?master[_-]?secret[\"']?[^\\S\r\n]*[=:][^\\S\r\n]*[\"']?[\\w-]+[\"']?"
+    keywords: ["urban", "master", "secret"]
+    severity: high
+  - id: vendor.urban_key
+    pattern: "(?i)[\"']?urban[_-]?key[\"']?[^\\S\r\n]*[=:][^\\S\r\n]*[\"']?[\\w-]+[\"']?"
+    keywords: ["urban", "key"]
+    severity: high
+  - id: vendor.unity_serial
+    pattern: "(?i)[\"']?unity[_-]?serial[\"']?[^\\S\r\n]*[=:][^\\S\r\n]*[\"']?[\\w-]+[\"']?"
+    keywords: ["unity", "serial"]
+    severity: high
+  - id: vendor.unity_password
+    pattern: "(?i)[\"']?unity[_-]?password[\"']?[^\\S\r\n]*[=:][^\\S\r\n]*[\"']?[\\w-]+[\"']?"
+    keywords: ["unity", "password"]
+    severity: high
+  - id: vendor.twitteroauthaccesstoken
+    pattern: "(?i)[\"']?twitteroauthaccesstoken[\"']?[^\\S\r\n]*[=:][^\\S\r\n]*[\"']?[\\w-]+[\"']?"
+    keywords: ["twitter", "oauth", "access", "token"]
+    severity: high
+  - id: vendor.twitteroauthaccesssecret
+    pattern: "(?i)[\"']?twitteroauthaccesssecret[\"']?[^\\S\r\n]*[=:][^\\S\r\n]*[\"']?[\\w-]+[\"']?"
+    keywords: ["twitter", "oauth", "access", "secret"]
+    severity: high
+  - id: vendor.twitter_consumer_secret
+    pattern: "(?i)[\"']?twitter[_-]?consumer[_-]?secret[\"']?[^\\S\r\n]*[=:][^\\S\r\n]*[\"']?[\\w-]+[\"']?"
+    keywords: ["twitter", "consumer", "secret"]
+    severity: high
+  - id: vendor.twitter_consumer_key
+    pattern: "(?i)[\"']?twitter[_-]?consumer[_-]?key[\"']?[^\\S\r\n]*[=:][^\\S\r\n]*[\"']?[\\w-]+[\"']?"
+    keywords: ["twitter", "consumer", "key"]
+    severity: high
+  - id: vendor.twine_password
+    pattern: "(?i)[\"']?twine[_-]?password[\"']?[^\\S\r\n]*[=:][^\\S\r\n]*[\"']?[\\w-]+[\"']?"
+    keywords: ["twine", "password"]
+    severity: high
+  - id: vendor.twilio_token
+    pattern: "(?i)[\"']?twilio[_-]?token[\"']?[^\\S\r\n]*[=:][^\\S\r\n]*[\"']?[\\w-]+[\"']?"
+    keywords: ["twilio", "token"]
+    severity: high
+  - id: vendor.twilio_sid
+    pattern: "(?i)[\"']?twilio[_-]?sid[\"']?[^\\S\r\n]*[=:][^\\S\r\n]*[\"']?[\\w-]+[\"']?"
+    keywords: ["twilio", "sid"]
+    severity: high
+  - id: vendor.twilio_configuration_sid
+    pattern: "(?i)[\"']?twilio[_-]?configuration[_-]?sid[\"']?[^\\S\r\n]*[=:][^\\S\r\n]*[\"']?[\\w-]+[\"']?"
+    keywords: ["twilio", "configuration", "sid"]
+    severity: high
+  - id: vendor.twilio_chat_account_api_service
+    pattern: "(?i)[\"']?twilio[_-]?chat[_-]?account[_-]?api[_-]?service[\"']?[^\\S\r\n]*[=:][^\\S\r\n]*[\"']?[\\w-]+[\"']?"
+    keywords: ["twilio", "chat", "account", "api", "service"]
+    severity: high
+  - id: vendor.twilio_api_secret
+    pattern: "(?i)[\"']?twilio[_-]?api[_-]?secret[\"']?[^\\S\r\n]*[=:][^\\S\r\n]*[\"']?[\\w-]+[\"']?"
+    keywords: ["twilio", "api", "secret"]
+    severity: high
+  - id: vendor.twilio_api_key
+    pattern: "(?i)[\"']?twilio[_-]?api[_-]?key[\"']?[^\\S\r\n]*[=:][^\\S\r\n]*[\"']?[\\w-]+[\"']?"
+    keywords: ["twilio", "api", "key"]
+    severity: high
+  - id: vendor.trex_okta_client_token
+    pattern: "(?i)[\"']?trex[_-]?okta[_-]?client[_-]?token[\"']?[^\\S\r\n]*[=:][^\\S\r\n]*[\"']?[\\w-]+[\"']?"
+    keywords: ["trex", "okta", "client", "token"]
+    severity: high
+  - id: vendor.trex_client_token
+    pattern: "(?i)[\"']?trex[_-]?client[_-]?token[\"']?[^\\S\r\n]*[=:][^\\S\r\n]*[\"']?[\\w-]+[\"']?"
+    keywords: ["trex", "client", "token"]
+    severity: high
+  - id: vendor.travis_token
+    pattern: "(?i)[\"']?travis[_-]?token[\"']?[^\\S\r\n]*[=:][^\\S\r\n]*[\"']?[\\w-]+[\"']?"
+    keywords: ["travis", "token"]
+    severity: high
+  - id: vendor.travis_secure_env_vars
+    pattern: "(?i)[\"']?travis[_-]?secure[_-]?env[_-]?vars[\"']?[^\\S\r\n]*[=:][^\\S\r\n]*[\"']?[\\w-]+[\"']?"
+    keywords: ["travis", "secure", "env", "vars"]
+    severity: high
+  - id: vendor.travis_pull_request
+    pattern: "(?i)[\"']?travis[_-]?pull[_-]?request[\"']?[^\\S\r\n]*[=:][^\\S\r\n]*[\"']?[\\w-]+[\"']?"
+    keywords: ["travis", "pull", "request"]
+    severity: high
+  - id: vendor.travis_gh_token
+    pattern: "(?i)[\"']?travis[_-]?gh[_-]?token[\"']?[^\\S\r\n]*[=:][^\\S\r\n]*[\"']?[\\w-]+[\"']?"
+    keywords: ["travis", "github", "token"]
+    severity: high
+  - id: vendor.travis_e2e_token
+    pattern: "(?i)[\"']?travis[_-]?e2e[_-]?token[\"']?[^\\S\r\n]*[=:][^\\S\r\n]*[\"']?[\\w-]+[\"']?"
+    keywords: ["travis", "e2e", "token"]
+    severity: high
+  - id: vendor.travis_com_token
+    pattern: "(?i)[\"']?travis[_-]?com[_-]?token[\"']?[^\\S\r\n]*[=:][^\\S\r\n]*[\"']?[\\w-]+[\"']?"
+    keywords: ["travis", "com", "token"]
+    severity: high
+  - id: vendor.travis_branch
+    pattern: "(?i)[\"']?travis[_-]?branch[\"']?[^\\S\r\n]*[=:][^\\S\r\n]*[\"']?[\\w-]+[\"']?"
+    keywords: ["travis", "branch"]
+    severity: high
+  - id: vendor.travis_api_token
+    pattern: "(?i)[\"']?travis[_-]?api[_-]?token[\"']?[^\\S\r\n]*[=:][^\\S\r\n]*[\"']?[\\w-]+[\"']?"
+    keywords: ["travis", "api", "token"]
+    severity: high
+  - id: vendor.travis_access_token
+    pattern: "(?i)[\"']?travis[_-]?access[_-]?token[\"']?[^\\S\r\n]*[=:][^\\S\r\n]*[\"']?[\\w-]+[\"']?"
+    keywords: ["travis", "access", "token"]
+    severity: high
+  - id: vendor.token_core_java
+    pattern: "(?i)[\"']?token[_-]?core[_-]?java[\"']?[^\\S\r\n]*[=:][^\\S\r\n]*[\"']?[\\w-]+[\"']?"
+    keywords: ["token", "core", "java"]
+    severity: high
+  - id: vendor.thera_oss_access_key
+    pattern: "(?i)[\"']?thera[_-]?oss[_-]?access[_-]?key[\"']?[^\\S\r\n]*[=:][^\\S\r\n]*[\"']?[\\w-]+[\"']?"
+    keywords: ["thera", "oss", "access", "key"]
+    severity: high
+  - id: vendor.tester_keys_password
+    pattern: "(?i)[\"']?tester[_-]?keys[_-]?password[\"']?[^\\S\r\n]*[=:][^\\S\r\n]*[\"']?[\\w-]+[\"']?"
+    keywords: ["tester", "keys", "password"]
+    severity: high
+  - id: vendor.test_test
+    pattern: "(?i)[\"']?test[_-]?test[\"']?[^\\S\r\n]*[=:][^\\S\r\n]*[\"']?[\\w-]+[\"']?"
+    keywords: ["test", "test"]
+    severity: high
+  - id: vendor.test_github_token
+    pattern: "(?i)[\"']?test[_-]?github[_-]?token[\"']?[^\\S\r\n]*[=:][^\\S\r\n]*[\"']?[\\w-]+[\"']?"
+    keywords: ["test", "github", "token"]
+    severity: high
+  - id: vendor.tesco_api_key
+    pattern: "(?i)[\"']?tesco[_-]?api[_-]?key[\"']?[^\\S\r\n]*[=:][^\\S\r\n]*[\"']?[\\w-]+[\"']?"
+    keywords: ["tesco", "api", "key"]
+    severity: high
+  - id: vendor.svn_pass
+    pattern: "(?i)[\"']?svn[_-]?pass[\"']?[^\\S\r\n]*[=:][^\\S\r\n]*[\"']?[\\w-]+[\"']?"
+    keywords: ["svn", "pass"]
+    severity: high
+  - id: vendor.surge_token
+    pattern: "(?i)[\"']?surge[_-]?token[\"']?[^\\S\r\n]*[=:][^\\S\r\n]*[\"']?[\\w-]+[\"']?"
+    keywords: ["surge", "token"]
+    severity: high
+  - id: vendor.surge_login
+    pattern: "(?i)[\"']?surge[_-]?login[\"']?[^\\S\r\n]*[=:][^\\S\r\n]*[\"']?[\\w-]+[\"']?"
+    keywords: ["surge", "login"]
+    severity: high
+  - id: vendor.stripe_public
+    pattern: "(?i)[\"']?stripe[_-]?public[\"']?[^\\S\r\n]*[=:][^\\S\r\n]*[\"']?[\\w-]+[\"']?"
+    keywords: ["stripe", "public"]
+    severity: high
+  - id: vendor.stripe_private
+    pattern: "(?i)[\"']?stripe[_-]?private[\"']?[^\\S\r\n]*[=:][^\\S\r\n]*[\"']?[\\w-]+[\"']?"
+    keywords: ["stripe", "private"]
+    severity: high
+  - id: vendor.strip_secret_key
+    pattern: "(?i)[\"']?strip[_-]?secret[_-]?key[\"']?[^\\S\r\n]*[=:][^\\S\r\n]*[\"']?[\\w-]+[\"']?"
+    keywords: ["strip", "secret", "key"]
+    severity: high
+  - id: vendor.strip_publishable_key
+    pattern: "(?i)[\"']?strip[_-]?publishable[_-]?key[\"']?[^\\S\r\n]*[=:][^\\S\r\n]*[\"']?[\\w-]+[\"']?"
+    keywords: ["strip", "publishable", "key"]
+    severity: high
+  - id: vendor.stormpath_api_key_secret
+    pattern: "(?i)[\"']?stormpath[_-]?api[_-]?key[_-]?secret[\"']?[^\\S\r\n]*[=:][^\\S\r\n]*[\"']?[\\w-]+[\"']?"
+    keywords: ["stormpath", "api", "key", "secret"]
+    severity: high
+  - id: vendor.stormpath_api_key_id
+    pattern: "(?i)[\"']?stormpath[_-]?api[_-]?key[_-]?id[\"']?[^\\S\r\n]*[=:][^\\S\r\n]*[\"']?[\\w-]+[\"']?"
+    keywords: ["stormpath", "api", "key", "id"]
+    severity: high
+  - id: vendor.starship_auth_token
+    pattern: "(?i)[\"']?starship[_-]?auth[_-]?token[\"']?[^\\S\r\n]*[=:][^\\S\r\n]*[\"']?[\\w-]+[\"']?"
+    keywords: ["starship", "auth", "token"]
+    severity: high
+  - id: vendor.starship_account_sid
+    pattern: "(?i)[\"']?starship[_-]?account[_-]?sid[\"']?[^\\S\r\n]*[=:][^\\S\r\n]*[\"']?[\\w-]+[\"']?"
+    keywords: ["starship", "account", "sid"]
+    severity: high
+  - id: vendor.star_test_secret_access_key
+    pattern: "(?i)[\"']?star[_-]?test[_-]?secret[_-]?access[_-]?key[\"']?[^\\S\r\n]*[=:][^\\S\r\n]*[\"']?[\\w-]+[\"']?"
+    keywords: ["star", "test", "secret", "access", "key"]
+    severity: high
+  - id: vendor.star_test_location
+    pattern: "(?i)[\"']?star[_-]?test[_-]?location[\"']?[^\\S\r\n]*[=:][^\\S\r\n]*[\"']?[\\w-]+[\"']?"
+    keywords: ["star", "test", "location"]
+    severity: high
+  - id: vendor.star_test_bucket
+    pattern: "(?i)[\"']?star[_-]?test[_-]?bucket[\"']?[^\\S\r\n]*[=:][^\\S\r\n]*[\"']?[\\w-]+[\"']?"
+    keywords: ["star", "test", "bucket"]
+    severity: high
+  - id: vendor.star_test_aws_access_key_id
+    pattern: "(?i)[\"']?star[_-]?test[_-]?aws[_-]?access[_-]?key[_-]?id[\"']?[^\\S\r\n]*[=:][^\\S\r\n]*[\"']?[\\w-]+[\"']?"
+    keywords: ["star", "test", "aws", "access", "key", "id"]
+    severity: high
+  - id: vendor.staging_base_url_runscope
+    pattern: "(?i)[\"']?staging[_-]?base[_-]?url[_-]?runscope[\"']?[^\\S\r\n]*[=:][^\\S\r\n]*[\"']?[\\w-]+[\"']?"
+    keywords: ["staging", "base", "url", "runscope"]
+    severity: high

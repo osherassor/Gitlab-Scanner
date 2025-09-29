@@ -1,0 +1,38 @@
+# OSX
+.DS_Store
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+.venv/
+venv/
+env/
+.env
+.env.*
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+coverage.xml
+
+# Build / packaging
+build/
+dist/
+*.egg-info/
+
+# Editors/IDE
+.vscode/
+.idea/
+
+# Tool outputs
+gitlab-scan-output/
+report.html
+*.jsonl
+
+# Logs
+*.log
+
+
