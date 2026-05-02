@@ -1,140 +1,140 @@
-GitLab Scanner
+<h1 align="center">🦊 GitLab Scanner</h1>
 
-GitLab Scanner is a Python CLI for reconnaissance and secret scanning against GitLab instances (Self‑Managed or SaaS). It can run unauthenticated for public discovery or with authentication to increase coverage. The tool discovers projects and groups, harvests users, scans repository files for potential secrets based on configurable regex rules, optionally scans commit history, and writes structured JSON/JSONL outputs plus an HTML report per run.
+<p align="center">
+  <strong>Recon and secret-scan a GitLab instance in one command.</strong><br>
+  Public discovery without auth, deeper coverage with a token. Repo files + commit history + structured JSON / JSONL / HTML output.
+</p>
 
-### Features
-- Discover projects and groups (public only or public+private when authenticated)
-- Harvest users from members, commits, and the API
-- Scan repository files for potential secrets using YAML‑defined regex rules
-- Optional commit history scan with de‑duplication vs HEAD
-- Intelligent skipping of binary/large files
-- Structured outputs: JSONL (line‑delimited) and continuously updated JSON snapshots
-- Per‑run HTML report
-- Rate limiting, retries and timeouts built in
+<p align="center">
+  <img src="https://img.shields.io/github/stars/osherassor/Gitlab-Scanner?style=for-the-badge&logo=github&color=ffd700" alt="Stars">
+  <img src="https://img.shields.io/github/last-commit/osherassor/Gitlab-Scanner?style=for-the-badge&logo=git&color=00d4aa" alt="Last commit">
+  <img src="https://img.shields.io/badge/python-3.9%2B-3776ab?style=for-the-badge&logo=python&logoColor=white" alt="Python">
+  <img src="https://img.shields.io/badge/license-MIT-informational?style=for-the-badge" alt="License">
+</p>
 
-### Requirements
-- Python 3.9+
-- Works on macOS, Linux, and Windows
+---
 
-### Installation
-Install from source:
+## What is this?
+
+A Python CLI for GitLab — Self-Managed or SaaS — that walks the instance, enumerates projects/groups/users, scans repository files (and optionally commit history) for secrets using regex rules you control, then writes everything to a per-run output folder with a clean HTML report on top.
+
+Run it unauthenticated against a public instance, or with a Personal Access Token / username+password for the deep dive.
+
+## 🚀 Quick start
 
 ```bash
 pip install -e .
-```
 
-Optionally, use an isolated environment:
-
-```bash
-python -m venv .venv
-source .venv/bin/activate  # Windows: .venv\\Scripts\\activate
-pip install -e .
-```
-
-### Quick start
-Public discovery (no auth):
-
-```bash
+# Public discovery — no auth
 gitlab-scanner --base-url https://gitlab.example.com
-```
 
-With Personal Access Token (PAT):
-
-```bash
+# With a Personal Access Token
 gitlab-scanner --base-url https://gitlab.example.com --token <PAT>
-```
 
-With username/password session:
-
-```bash
+# With user/pass
 gitlab-scanner --base-url https://gitlab.example.com \
-  --username <USERNAME> --password <PASSWORD>
-```
+  --username <USER> --password <PASS>
 
-Scan multiple targets from a file (one URL per line; auth flags are not allowed in this mode):
-
-```bash
+# Multi-target sweep (no auth flags allowed in this mode)
 gitlab-scanner --base-url-file targets.txt
 ```
 
-### CLI usage
-Core flags (see `gitlab_scanner/cli.py`):
-- `--base-url <url>`: GitLab base URL (http/https). Mutually exclusive with `--base-url-file`.
-- `--base-url-file <path>`: File with base URLs, one per line. Auth flags are not allowed with this option.
+## ✨ Features
 
-Authentication:
-- `--token <PAT>`
-- `--username <USER> --password <PASS>`
+- 🔭 **Discovery** — projects + groups (public, or public + private when authenticated)
+- 👥 **User harvesting** — pulled from membership, commits, and the API
+- 🕵️ **Repo file scanning** — YAML-defined regex rules for secrets
+- 🕰️ **Commit history scan** — optional, with HEAD de-duplication
+- 🧠 **Smart skipping** — binary and oversized files are bypassed
+- 📦 **Structured output** — JSONL streams during the run, JSON snapshots stay valid arrays throughout
+- 📊 **Per-run HTML report** — drop-in for client deliverables
+- ⚙️ **Built-in rate limiting, retries, timeouts**
 
-General:
-- `--verify-ssl` Enable TLS certificate verification (default: off)
-- `--out-dir <path>` Output directory (default: `./gitlab-scan-output`)
-- `--rules-yaml <path>` Path to rules YAML (default: `./config/rules.yaml`)
+## 🔧 CLI essentials
 
-History:
-- `--no-scan-history` Disable commit history scanning (HEAD scanning remains enabled)
-
-Logging:
-- `--debug` Increase log verbosity for this run
-
-Examples:
+| Flag | Description |
+|---|---|
+| `--base-url <url>` | GitLab base URL — mutually exclusive with `--base-url-file` |
+| `--base-url-file <path>` | Multiple targets, one per line (no auth flags allowed here) |
+| `--token <PAT>` | Personal Access Token |
+| `--username` / `--password` | Session-based auth |
+| `--verify-ssl` | Enable TLS cert verification (default: off) |
+| `--out-dir <path>` | Output directory (default: `./gitlab-scan-output`) |
+| `--rules-yaml <path>` | Custom rules file (default: `./config/rules.yaml`) |
+| `--no-scan-history` | Disable commit history scan (HEAD scanning stays on) |
+| `--debug` | Verbose logging |
 
 ```bash
-# Safer TLS (recommended for production)
+# Production-safe TLS
 gitlab-scanner --base-url https://gitlab.example.com --verify-ssl
 
-# Custom output directory and custom rules
+# Custom output + custom rules
 gitlab-scanner --base-url https://gitlab.example.com \
   --out-dir ./out --rules-yaml ./config/rules.yaml
 
-# Disable history to speed up
+# Faster — skip history
 gitlab-scanner --base-url https://gitlab.example.com --no-scan-history
 ```
 
-### Configuration
-Runtime configuration is loaded from `config/scan_config.yaml`. It controls logging, output behavior (JSONL and live JSON snapshots), HTTP timeouts/rate‑limits, and scanning limits (max file size, interesting file patterns, binary extensions, etc.).
+## 🛠️ Configuration
 
-Secret‑scanning rules are provided in `config/rules.yaml` (or `--rules-yaml`). Each rule contains an `id` and a regex `pattern`. Only textual files are scanned; binary/oversized files are skipped.
+Two YAMLs control behavior:
 
-### Outputs
-Every run creates a unique subfolder under `--out-dir`:
+| File | Controls |
+|---|---|
+| `config/scan_config.yaml` | Logging, output (JSONL streaming + JSON snapshots), HTTP timeouts/rate limits, scan limits (max file size, interesting file patterns, binary extensions) |
+| `config/rules.yaml` | Secret-scanning regex rules — each entry has an `id` and a `pattern`. Only textual files are scanned |
 
-- `repos.json` / `repos.jsonl` – Discovered projects
-- `groups.json` / `groups.jsonl` – Discovered groups and subgroups
-- `users.json` / `users.jsonl` and `users.csv` – Aggregated users from multiple sources
-- `files.json` / `files.jsonl` – Enumerated files per repository
-- `interesting.jsonl` – Files matching interesting name/extension patterns
-- `secrets.json` / `secrets.jsonl` – Potential secrets with entropy and context
-- `skipped.jsonl` – Files skipped due to size/binary/other reasons
-- `report.html` – Summary HTML report
+## 📤 Outputs
 
-Snapshots (`*.json`) remain valid JSON arrays throughout the run; line‑delimited (`*.jsonl`) are written live for stream processing.
+Every run gets its own subfolder under `--out-dir`:
 
-### How it works (high‑level)
-1) Fetch instance topology and version (best effort).
-2) Discover projects and groups (public only or also private when authenticated).
-3) Harvest users from group/project membership, commit authors, and (if authenticated) global API.
-4) Scan repository file trees for potential secrets using rules. Skip large/binary files and keep progress responsive.
-5) Optionally scan commit diffs within a time/commit budget and de‑duplicate matches already present in HEAD.
-6) Generate per‑run outputs and an HTML report.
+| File | Contents |
+|---|---|
+| `repos.json` / `.jsonl` | Discovered projects |
+| `groups.json` / `.jsonl` | Discovered groups + subgroups |
+| `users.json` / `.jsonl` / `.csv` | Aggregated users |
+| `files.json` / `.jsonl` | Enumerated files per repo |
+| `interesting.jsonl` | Files matching interesting name/extension patterns |
+| `secrets.json` / `.jsonl` | Potential secrets with entropy + context |
+| `skipped.jsonl` | Skipped files with reasons |
+| `report.html` | Summary HTML report |
 
-### Ethics and legal notice
-This project is provided for research, defensive security, and legitimate testing only. You are solely responsible for complying with all applicable laws, regulations, and terms of service. Do not scan systems you do not own or do not have explicit authorization to test. The authors and contributors assume no liability for misuse or damages arising from the use of this tool.
+`*.json` snapshots stay valid throughout the run; `*.jsonl` streams live for downstream pipelines.
 
-### Troubleshooting
-- TLS warnings: enable `--verify-ssl` and ensure proper CA trust.
-- 401/403 responses: provide a valid `--token` or `--username/--password` with appropriate permissions.
-- Rate limits: the tool applies backoff and throttling; very large instances may still require patience or narrower scopes.
+## 🧠 How it works (high level)
 
-### Development
-Run locally in editable mode:
+1. Fetch instance topology + version (best effort).
+2. Discover projects + groups (auth-gated visibility).
+3. Harvest users from group/project members, commit authors, and (auth) the global API.
+4. Scan repo file trees with regex rules, skipping binary/large files.
+5. Optional commit-diff scan inside a time/commit budget, de-duped against HEAD matches.
+6. Write per-run outputs + HTML report.
+
+## 🧯 Troubleshooting
+
+- **TLS warnings** — turn on `--verify-ssl` and ensure CA trust is correct
+- **401 / 403** — provide a valid `--token` or `--username`/`--password` with sufficient scope
+- **Rate limits** — backoff is built in; very large instances may still need narrower scopes or patience
+
+## 🤝 Pairs well with
+
+- 🗂️ **[smb_files_scanner](https://github.com/osherassor/smb_files_scanner)** — the same secret-pattern philosophy, but for SMB shares instead of GitLab repos. Run both to cover both surfaces on an internal engagement.
+- 🧰 **[MyCyberTool](https://github.com/osherassor/MyCyberTool)** — when something interesting comes out of a bundle / page / leaked file, push it through the secrets scanner there for a second opinion.
+
+## 🛠️ Development
 
 ```bash
+# Editable install + dev extras
 pip install -e .[dev]
 ```
 
-Entry point: `gitlab-scanner` (see `gitlab_scanner/cli.py`).
+Entry point: `gitlab-scanner` → `gitlab_scanner/cli.py`.
 
-### License
-MIT – see `LICENSE`.
+## ⚖️ Responsible use
 
+For research, defensive security, and authorized testing only. Don't scan instances you don't own or aren't engaged on. You're responsible for ToS / legal compliance.
+
+## 📄 License
+
+MIT
